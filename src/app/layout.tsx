@@ -27,9 +27,11 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps): React.ReactElement {
   return (
     <html lang="ko">
-      <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} antialiased bg-white`}>
         <AppProvider>
-          {children}
+          <div className="claude-container">
+            {children}
+          </div>
         </AppProvider>
       </body>
     </html>

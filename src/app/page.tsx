@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { MainLayout } from '@/components/layout/MainLayout';
+import { Header } from '@/components/layout/Header';
 import { MessageList } from '@/components/chat/MessageList';
 import { MessageInput } from '@/components/chat/MessageInput';
 import { useApp } from '@/context/AppContext';
@@ -55,7 +55,7 @@ export default function HomePage(): React.ReactElement {
       console.error('Message handling error:', err);
       
       // 예상치 못한 오류 처리
-      const assistantMessageId = addAssistantMessage(
+      addAssistantMessage(
         '❌ 예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
       );
     } finally {
@@ -71,11 +71,15 @@ export default function HomePage(): React.ReactElement {
   ]);
 
   return (
-    <MainLayout>
-      <div className="space-y-6">
+    <>
+      {/* 헤더 */}
+      <Header />
+
+      {/* 메시지 영역 */}
+      <div className="claude-messages">
         {/* 에러 표시 */}
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               {error}
@@ -83,19 +87,16 @@ export default function HomePage(): React.ReactElement {
           </Alert>
         )}
 
-        {/* 메시지 리스트 */}
-        <div className="min-h-[60vh]">
-          <MessageList typingMessageId={typingMessageId} />
-        </div>
-
-        {/* 메시지 입력 */}
-        <div className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4">
-          <MessageInput 
-            onSendMessage={handleSendMessage}
-            disabled={isLoading || state.isProcessing}
-          />
-        </div>
+        <MessageList typingMessageId={typingMessageId} />
       </div>
-    </MainLayout>
+
+      {/* 입력 영역 */}
+      <div className="claude-input-area">
+        <MessageInput 
+          onSendMessage={handleSendMessage}
+          disabled={isLoading || state.isProcessing}
+        />
+      </div>
+    </>
   );
 }
