@@ -1,103 +1,101 @@
-import Image from "next/image";
+// app/page.tsx
+'use client';
 
-export default function Home() {
+import React, { useState, useCallback } from 'react';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { MessageList } from '@/components/chat/MessageList';
+import { MessageInput } from '@/components/chat/MessageInput';
+import { useApp } from '@/context/AppContext';
+import { useQuery } from '@/hooks/useQuery';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+
+export default function HomePage(): React.ReactElement {
+  const [typingMessageId, setTypingMessageId] = useState<string | undefined>();
+  const { 
+    addUserMessage, 
+    addAssistantMessage, 
+    updateMessage, 
+    setAnalysisResult,
+    state 
+  } = useApp();
+  const { executeQuery, isLoading, error, clearError } = useQuery();
+
+  const handleSendMessage = useCallback(async (message: string): Promise<void> => {
+    try {
+      clearError();
+      
+      // 사용자 메시지 추가
+      addUserMessage(message);
+      
+      // AI 응답 메시지 추가 (타이핑 상태)
+      const assistantMessageId = addAssistantMessage('');
+      setTypingMessageId(assistantMessageId);
+
+      // API 호출
+      const result = await executeQuery(message);
+      
+      if (result) {
+        // 성공 시 메시지 업데이트
+        updateMessage(
+          assistantMessageId, 
+          `✅ 쿼리가 성공적으로 실행되었습니다.\n\n**실행된 SQL:**\n\`\`\`sql\n${result.generated_sql}\n\`\`\`\n\n**결과:** ${result.row_count.toLocaleString()}개의 레코드가 조회되었습니다.`
+        );
+        
+        // 분석 결과 설정
+        setAnalysisResult(assistantMessageId, result);
+      } else {
+        // 실패 시 오류 메시지
+        updateMessage(
+          assistantMessageId,
+          '❌ 쿼리 실행에 실패했습니다. 다시 시도해주세요.'
+        );
+      }
+    } catch (err) {
+      console.error('Message handling error:', err);
+      
+      // 예상치 못한 오류 처리
+      const assistantMessageId = addAssistantMessage(
+        '❌ 예상치 못한 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      );
+    } finally {
+      setTypingMessageId(undefined);
+    }
+  }, [
+    addUserMessage, 
+    addAssistantMessage, 
+    updateMessage, 
+    setAnalysisResult, 
+    executeQuery, 
+    clearError
+  ]);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <MainLayout>
+      <div className="space-y-6">
+        {/* 에러 표시 */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* 메시지 리스트 */}
+        <div className="min-h-[60vh]">
+          <MessageList typingMessageId={typingMessageId} />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* 메시지 입력 */}
+        <div className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-4">
+          <MessageInput 
+            onSendMessage={handleSendMessage}
+            disabled={isLoading || state.isProcessing}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </div>
+      </div>
+    </MainLayout>
   );
 }
