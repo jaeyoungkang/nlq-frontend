@@ -4,33 +4,67 @@
 
 @layer base {
   :root {
-    --background: 255 255 255;
-    --foreground: 47 47 47;
+    --background: 255 255 255; /* 순백색 배경 */
+    --foreground: 47 47 47; /* 텍스트 색상 #2f2f2f */
     --card: 255 255 255;
     --card-foreground: 47 47 47;
     --popover: 255 255 255;
     --popover-foreground: 47 47 47;
-    --primary: 217 119 6; /* Claude 오렌지 #d97706 */
+    --primary: 217 119 6; /* 오렌지 #d97706 */
     --primary-foreground: 255 255 255;
-    --secondary: 247 247 248;
+    --secondary: 247 247 248; /* 배경 #f7f7f8 */
     --secondary-foreground: 47 47 47;
-    --muted: 247 247 248;
-    --muted-foreground: 102 102 102;
-    --accent: 217 119 6; /* Claude 오렌지 */
+    --muted: 247 247 248; /* 배경 #f7f7f8 */
+    --muted-foreground: 102 102 102; /* 보조 텍스트 #666666 */
+    --accent: 217 119 6; /* 오렌지 */
     --accent-foreground: 255 255 255;
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
-    --border: 229 229 230;
-    --input: 209 213 219;
-    --ring: 217 119 6;
-    --radius: 0.75rem;
+    --border: 229 229 230; /* 테두리 #e5e5e6 */
+    --input: 229 229 230; /* 테두리 색상으로 입력창 테두리 */
+    --ring: 217 119 6; /* 포커스 링을 오렌지로 */
+    --radius: 0.75rem; /* 12px 둥근 모서리 */
     
-    /* Claude 전용 색상 변수 */
-    --claude-bg: 247 247 248;
-    --claude-border: 229 229 230;
-    --claude-text: 47 47 47;
-    --claude-secondary: 102 102 102;
-    --claude-accent: 217 119 6;
+    /* 앱 전용 색상 변수 */
+    --app-bg: 247 247 248; /* #f7f7f8 */
+    --app-border: 229 229 230; /* #e5e5e6 */
+    --app-text: 47 47 47; /* #2f2f2f */
+    --app-secondary: 102 102 102; /* #666666 */
+    --app-accent: 217 119 6; /* #d97706 */
+    --app-accent-hover: 180 83 9; /* #b45309 - hover 상태 */
+    --app-input-focus: rgba(217, 119, 6, 0.1); /* 입력창 포커스 시 그림자 */
+  }
+
+  /* 다크 모드 지원 (선택사항) */
+  .dark {
+    --background: 24 24 27;
+    --foreground: 250 250 250;
+    --card: 24 24 27;
+    --card-foreground: 250 250 250;
+    --popover: 24 24 27;
+    --popover-foreground: 250 250 250;
+    --primary: 217 119 6;
+    --primary-foreground: 255 255 255;
+    --secondary: 39 39 42;
+    --secondary-foreground: 250 250 250;
+    --muted: 39 39 42;
+    --muted-foreground: 161 161 170;
+    --accent: 217 119 6;
+    --accent-foreground: 255 255 255;
+    --destructive: 248 113 113;
+    --destructive-foreground: 24 24 27;
+    --border: 39 39 42;
+    --input: 39 39 42;
+    --ring: 217 119 6;
+    
+    /* 다크 모드 앱 색상 */
+    --app-bg: 39 39 42;
+    --app-border: 63 63 70;
+    --app-text: 250 250 250;
+    --app-secondary: 161 161 170;
+    --app-accent: 217 119 6;
+    --app-accent-hover: 180 83 9;
+    --app-input-focus: rgba(217, 119, 6, 0.2);
   }
 
   * {
@@ -40,131 +74,207 @@
   body {
     @apply bg-white text-foreground;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
   }
 }
 
 @layer components {
-  /* Claude 스타일 컨테이너 */
-  .claude-container {
-    @apply max-w-3xl mx-auto bg-white min-h-screen flex flex-col;
+  /* 메인 컨테이너 */
+  .main-container {
+    width: 960px;
+    margin: 0 auto;
+    background: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
-  .claude-header {
-    @apply bg-white border-b px-6 py-4 sticky top-0 z-10;
-    border-color: rgb(var(--claude-border));
+  .app-header {
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid rgb(var(--app-border));
+    padding: 1rem 2rem;
   }
 
-  .claude-messages {
-    @apply flex-1 px-6 py-4 overflow-y-auto;
+  .app-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 2rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
-  .claude-input-area {
-    @apply border-t px-6 py-4 bg-white sticky bottom-0;
-    border-color: rgb(var(--claude-border));
+  .app-input-area {
+    background: white;
+    position: sticky;
+    bottom: 0;
+    border-top: 1px solid rgb(var(--app-border));
+    padding: 1rem 2rem;
   }
 
   /* 메시지 스타일 */
   .message {
-    @apply mb-6;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .user-message-bubble {
-    @apply rounded-xl p-4 ml-8 leading-relaxed;
-    background: rgb(var(--claude-bg));
-    border: 1px solid rgb(var(--claude-border));
-    color: rgb(var(--claude-text));
+    background: rgb(var(--app-bg));
+    border: 1px solid rgb(var(--app-border));
+    color: rgb(var(--app-text));
+    margin-left: 2rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    line-height: 1.6;
   }
 
   .assistant-message-content {
-    @apply mb-6;
+    margin-bottom: 1.5rem;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   /* 입력 영역 스타일 */
-  .claude-input-wrapper {
-    @apply relative border rounded-xl bg-white transition-all duration-200;
-    border-color: rgb(var(--input));
+  .input-wrapper {
+    position: relative;
+    background: white;
+    transition: all 0.2s;
+    border: 1px solid rgb(var(--input));
+    border-radius: 0.75rem;
   }
 
-  .claude-input-wrapper:focus-within {
-    border-color: rgb(var(--claude-accent));
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+  .input-wrapper:focus-within {
+    border-color: rgb(var(--app-accent));
+    box-shadow: 0 0 0 3px var(--app-input-focus);
   }
 
-  .claude-textarea {
-    @apply w-full border-none outline-none resize-none rounded-xl text-base leading-6 bg-transparent;
+  .input-textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    background: transparent;
     padding: 1rem 3rem 1rem 1rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
     max-height: 200px;
     min-height: 50px;
   }
 
-  .claude-send-button {
-    @apply absolute right-3 bottom-3 w-8 h-8 border-none rounded-md flex items-center justify-center transition-colors cursor-pointer;
-    background: rgb(var(--claude-accent));
+  .send-button {
+    position: absolute;
+    border: none;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    background: rgb(var(--app-accent));
     color: white;
   }
 
-  .claude-send-button:hover:not(:disabled) {
-    background: rgb(180 83 9); /* hover:bg-amber-700 */
+  .send-button:hover:not(:disabled) {
+    background: rgb(var(--app-accent-hover));
   }
 
-  .claude-send-button:disabled {
-    @apply bg-gray-300 cursor-not-allowed;
+  .send-button:disabled {
+    background: rgb(209 213 219);
+    cursor: not-allowed;
   }
 
   /* 예시 질문 그리드 */
-  .claude-example-grid {
-    @apply grid grid-cols-1 md:grid-cols-2 gap-3;
+  .example-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 0.75rem;
   }
 
-  .claude-example-question {
-    @apply p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white text-sm;
-    border-color: rgb(var(--claude-border));
-    color: rgb(var(--claude-text));
+  .example-question {
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+    padding: 0.75rem;
+    border: 1px solid rgb(var(--app-border));
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: rgb(var(--app-text));
   }
 
-  .claude-example-question:hover {
-    border-color: rgb(var(--claude-accent));
-    background: rgb(254 243 226); /* bg-amber-50 */
+  .example-question:hover {
+    border-color: rgb(var(--app-accent));
+    background: rgb(254 243 226);
   }
 
   /* 결과 박스 스타일 */
-  .claude-result-box {
-    @apply rounded-lg p-4 my-4;
-    background: rgb(var(--claude-bg));
-    border: 1px solid rgb(var(--claude-border));
+  .result-box {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    background: rgb(var(--app-bg));
+    border: 1px solid rgb(var(--app-border));
   }
 
-  .claude-sql-block {
-    @apply rounded-lg p-4 font-mono text-sm leading-6 overflow-x-auto;
-    background: rgb(var(--claude-bg));
-    border: 1px solid rgb(var(--claude-border));
-    color: rgb(var(--claude-text));
+  .sql-block {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    background: rgb(var(--app-bg));
+    border: 1px solid rgb(var(--app-border));
+    color: rgb(var(--app-text));
   }
 
-  .claude-badge {
-    @apply inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium bg-white;
-    border-color: rgb(var(--claude-border));
-    color: rgb(var(--claude-text));
+  .app-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.375rem;
+    border: 1px solid rgb(var(--app-border));
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: white;
+    color: rgb(var(--app-text));
   }
 
-  .claude-badge-secondary {
-    background: rgb(var(--claude-bg));
-    color: rgb(var(--claude-secondary));
+  .app-badge-secondary {
+    background: rgb(var(--app-bg));
+    color: rgb(var(--app-secondary));
   }
 
   /* 타이핑 애니메이션 */
   .typing-indicator {
-    @apply flex items-center text-sm;
-    color: rgb(var(--claude-secondary));
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: rgb(var(--app-secondary));
   }
 
   .typing-dots {
-    @apply inline-flex ml-2;
+    display: inline-flex;
+    margin-left: 0.5rem;
   }
 
   .typing-dots span {
-    @apply h-1 w-1 rounded-full inline-block mx-0.5;
-    background: rgb(var(--claude-secondary));
+    display: inline-block;
+    margin: 0 0.125rem;
+    height: 4px;
+    width: 4px;
+    background: rgb(var(--app-secondary));
+    border-radius: 50%;
     animation: typing 1.4s infinite ease-in-out;
   }
 
@@ -178,23 +288,32 @@
 }
 
 @layer utilities {
-  .bg-claude-accent {
-    background-color: rgb(217 119 6) !important;
+  /* 앱 브랜드 색상 유틸리티 클래스 */
+  .bg-app-accent {
+    background-color: rgb(var(--app-accent)) !important;
   }
   
-  .text-claude-text {
-    color: rgb(47 47 47) !important;
+  .text-app-text {
+    color: rgb(var(--app-text)) !important;
   }
   
-  .text-claude-secondary {
-    color: rgb(102 102 102) !important;
+  .text-app-secondary {
+    color: rgb(var(--app-secondary)) !important;
   }
   
-  .bg-claude-bg {
-    background-color: rgb(247 247 248) !important;
+  .bg-app-bg {
+    background-color: rgb(var(--app-bg)) !important;
   }
   
-  .border-claude-border {
-    border-color: rgb(229 229 230) !important;
+  .border-app-border {
+    border-color: rgb(var(--app-border)) !important;
+  }
+
+  .text-app-accent {
+    color: rgb(var(--app-accent)) !important;
+  }
+
+  .hover\:bg-app-accent-hover:hover {
+    background-color: rgb(var(--app-accent-hover)) !important;
   }
 }

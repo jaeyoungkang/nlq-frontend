@@ -87,59 +87,73 @@ export default function HomePage(): React.ReactElement {
   ]);
 
   return (
-    <div className="claude-container">
-      {/* 헤더 */}
-      <div className="claude-header">
+    <div className="main-container">
+      {/* 헤더 - 앱 스타일 적용 */}
+      <div className="app-header">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-foreground">GA4 데이터 분석</h1>
-            <p className="text-sm text-muted-foreground mt-1">BigQuery GA4 샘플 데이터 (2020.11.21)</p>
+            <h1 className="text-xl font-semibold text-app-text">GA4 데이터 분석</h1>
+            <p className="text-sm text-app-secondary mt-1">BigQuery GA4 샘플 데이터 (2020.11.21)</p>
           </div>
           <div className="flex items-center space-x-3">
-            {/* 모드 전환 버튼 */}
+            {/* 모드 전환 버튼 - 앱 스타일 적용 */}
             <Button
               variant={isMockMode ? "default" : "outline"}
               size="sm"
               onClick={() => setIsMockMode(!isMockMode)}
-              className="text-xs"
+              className={`text-xs transition-all duration-200 ${
+                isMockMode 
+                  ? 'bg-app-accent text-white hover:bg-app-accent-hover' 
+                  : 'border-app-border text-app-text hover:bg-app-bg hover:border-app-accent'
+              }`}
             >
               {isMockMode ? <WifiOff className="h-3 w-3 mr-1" /> : <Wifi className="h-3 w-3 mr-1" />}
               {isMockMode ? "목업 모드" : "실제 서버"}
             </Button>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-app-secondary">
               📊 nlq-ex.test_dataset.events_20201121
             </div>
           </div>
         </div>
       </div>
 
-      {/* 메시지 영역 */}
-      <div className="claude-messages">
-        {/* 모드 안내 */}
+      {/* 메시지 영역 - 앱 스타일 적용 */}
+      <div className="app-messages">
+        {/* 모드 안내 - 앱 스타일 알럿 */}
         {isMockMode && (
-          <Alert className="mb-4">
-            <WifiOff className="h-4 w-4" />
-            <AlertDescription>
-              <strong>목업 모드</strong>로 실행 중입니다. 서버 연결 없이 샘플 데이터로 테스트할 수 있습니다.
-            </AlertDescription>
-          </Alert>
+          <div className="result-box mb-4 border-l-4" style={{ borderLeftColor: 'rgb(217, 119, 6)' }}>
+            <div className="flex items-start">
+              <WifiOff className="h-4 w-4 mr-2 mt-0.5 text-app-accent flex-shrink-0" />
+              <div>
+                <div className="font-medium text-app-text mb-1">목업 모드</div>
+                <div className="text-sm text-app-secondary">
+                  서버 연결 없이 샘플 데이터로 테스트할 수 있습니다.
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
-        {/* 에러 표시 */}
+        {/* 에러 표시 - 앱 스타일 에러 박스 */}
         {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              {error}
-            </AlertDescription>
-          </Alert>
+          <div className="result-box mb-4 border-l-4 border-l-red-500">
+            <div className="flex items-start">
+              <AlertCircle className="h-4 w-4 mr-2 mt-0.5 text-red-500 flex-shrink-0" />
+              <div>
+                <div className="font-medium text-red-700 mb-1">오류 발생</div>
+                <div className="text-sm text-red-600">
+                  {error}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         <MessageList typingMessageId={typingMessageId} />
       </div>
 
-      {/* 입력 영역 */}
-      <div className="claude-input-area">
+      {/* 입력 영역 - 앱 스타일 적용 */}
+      <div className="app-input-area">
         <MessageInput 
           onSendMessage={handleSendMessage}
           disabled={isLoading || state.isProcessing}

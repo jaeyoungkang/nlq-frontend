@@ -22,19 +22,44 @@ export function MessageList({ typingMessageId }: MessageListProps): React.ReactE
     return (
       <div className="message">
         <div className="assistant-message-content">
-          <div className="flex items-start">
-            <div className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 bg-claude-accent">
+          <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
+            <div style={{
+              width: '1.5rem',
+              height: '1.5rem',
+              borderRadius: '50%',
+              background: 'rgb(217, 119, 6)',
+              color: 'white',
+              fontSize: '0.75rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '0.75rem',
+              marginTop: '0.125rem',
+              flexShrink: 0
+            }}>
               AI
             </div>
-            <div className="flex-1">
-            <p className="mb-4 text-claude-text">
-              안녕하세요! 저는 GA4 데이터 분석을 도와드리는 AI 어시스턴트입니다. 
-              자연어로 질문해주시면 BigQuery에서 데이터를 조회하고 결과를 정리해드리겠습니다.
-            </p>
+            <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
+              <p style={{
+                marginBottom: '1rem',
+                color: 'rgb(47, 47, 47)',
+                fontSize: '0.875rem',
+                lineHeight: '1.6'
+              }}>
+                안녕하세요! 저는 GA4 데이터 분석을 도와드리는 AI 어시스턴트입니다. 
+                자연어로 질문해주시면 BigQuery에서 데이터를 조회하고 결과를 정리해드리겠습니다.
+              </p>
 
-            <div className="claude-result-box">
-                <h3 className="font-medium text-claude-text mb-3">💡 예시 질문들</h3>
-                <div className="claude-example-grid">
+              <div className="result-box">
+                <h3 style={{
+                  fontWeight: '500',
+                  color: 'rgb(47, 47, 47)',
+                  marginBottom: '0.75rem',
+                  fontSize: '0.875rem'
+                }}>
+                  💡 예시 질문들
+                </h3>
+                <div className="example-grid">
                   <ExampleQuestion 
                     text="총 이벤트 수를 알려주세요"
                     onClick={() => window.setQuestion?.('총 이벤트 수를 알려주세요')}
@@ -69,7 +94,12 @@ export function MessageList({ typingMessageId }: MessageListProps): React.ReactE
   }
 
   return (
-    <div className="space-y-6">
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '1.5rem',
+      width: '100%'
+    }}>
       {state.messages.map((message) => (
         <Message 
           key={message.id} 
@@ -91,7 +121,7 @@ interface ExampleQuestionProps {
 function ExampleQuestion({ text, onClick }: ExampleQuestionProps): React.ReactElement {
   return (
     <div 
-      className="claude-example-question"
+      className="example-question"
       onClick={onClick}
     >
       &ldquo;{text}&rdquo;

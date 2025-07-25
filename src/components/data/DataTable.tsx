@@ -10,11 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DataRow, DataValue } from '@/lib/types';
-import { ChevronLeft, ChevronRight, Download, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Eye, Database } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DataTableProps {
@@ -28,12 +26,24 @@ const ROWS_PER_PAGE = 10;
 
 function formatCellValue(value: DataValue): React.ReactNode {
   if (value === null || value === undefined) {
-    return <span className="text-muted-foreground italic">NULL</span>;
+    return (
+      <span className="text-app-secondary italic bg-app-bg px-2 py-1 rounded text-xs">
+        NULL
+      </span>
+    );
   }
 
   if (typeof value === 'boolean') {
     return (
-      <Badge variant={value ? "default" : "secondary"} className="text-xs">
+      <Badge 
+        variant={value ? "default" : "secondary"} 
+        className={cn(
+          "text-xs font-medium",
+          value 
+            ? "bg-app-accent text-white" 
+            : "bg-app-bg text-app-secondary border-app-border"
+        )}
+      >
         {value ? 'TRUE' : 'FALSE'}
       </Badge>
     );
@@ -42,13 +52,25 @@ function formatCellValue(value: DataValue): React.ReactNode {
   if (typeof value === 'number') {
     // 큰 숫자는 천 단위 구분자 추가
     if (Math.abs(value) >= 1000) {
-      return value.toLocaleString('ko-KR');
+      return (
+        <span className="font-mono text-app-text">
+          {value.toLocaleString('ko-KR')}
+        </span>
+      );
     }
     // 소수점이 있는 경우 적절히 반올림
     if (value % 1 !== 0) {
-      return parseFloat(value.toFixed(4)).toString();
+      return (
+        <span className="font-mono text-app-text">
+          {parseFloat(value.toFixed(4)).toString()}
+        </span>
+      );
     }
-    return value.toString();
+    return (
+      <span className="font-mono text-app-text">
+        {value.toString()}
+      </span>
+    );
   }
 
   if (typeof value === 'string') {
@@ -56,9 +78,13 @@ function formatCellValue(value: DataValue): React.ReactNode {
     if (value.match(/^\d{4}-\d{2}-\d{2}/)) {
       try {
         const date = new Date(value);
-        return date.toLocaleDateString('ko-KR');
+        return (
+          <span className="text-app-text bg-app-bg px-2 py-1 rounded text-sm">
+            {date.toLocaleDateString('ko-KR')}
+          </span>
+        );
       } catch {
-        return value;
+        return <span className="text-app-text">{value}</span>;
       }
     }
 
@@ -69,7 +95,7 @@ function formatCellValue(value: DataValue): React.ReactNode {
           href={value} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="text-primary hover:underline"
+          className="text-app-accent hover:bg-app-accent-hover underline transition-colors"
         >
           {value.length > 30 ? `${value.substring(0, 30)}...` : value}
         </a>
@@ -81,15 +107,16 @@ function formatCellValue(value: DataValue): React.ReactNode {
       return (
         <span 
           title={value} 
-          className="cursor-help"
+          className="cursor-help text-app-text"
         >
-          {value.substring(0, 50)}...
+          {value.substring(0, 50)}
+          <span className="text-app-secondary">...</span>
         </span>
       );
     }
   }
 
-  return String(value);
+  return <span className="text-app-text">{String(value)}</span>;
 }
 
 export function DataTable({ 
@@ -159,106 +186,128 @@ export function DataTable({
 
   if (!data || data.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-muted-foreground">
-            <Eye className="h-8 w-8 mx-auto mb-2" />
-            <p>표시할 데이터가 없습니다.</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="result-box">
+        <div className="text-center py-8">
+          <Database className="h-12 w-12 mx-auto mb-4 text-app-secondary" />
+          <h3 className="text-lg font-medium text-app-text mb-2">데이터가 없습니다</h3>
+          <p className="text-sm text-app-secondary">
+            표시할 데이터가 없습니다. 다른 조건으로 검색해보세요.
+          </p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-lg">
+    <div className="result-box overflow-hidden">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-app-border">
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <Database className="h-5 w-5 text-app-accent" />
+            <h3 className="text-lg font-semibold text-app-text">
               {title || '쿼리 결과'}
-            </CardTitle>
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <span>총 {data.length.toLocaleString()}개</span>
-              {hasMoreData && (
-                <Badge variant="outline" className="text-xs">
-                  상위 {maxRows}개만 표시
-                </Badge>
-              )}
-            </div>
+            </h3>
           </div>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDownload}
-            className="h-8"
-          >
-            <Download className="h-4 w-4 mr-1" />
-            CSV
-          </Button>
+          <div className="flex items-center space-x-3 text-sm text-app-secondary">
+            <span>총 {data.length.toLocaleString()}개 레코드</span>
+            {hasMoreData && (
+              <span className="app-badge app-badge-secondary">
+                상위 {maxRows}개만 표시
+              </span>
+            )}
+            <span className="app-badge">
+              {columns.length}개 컬럼
+            </span>
+          </div>
         </div>
-      </CardHeader>
+        
+        <button
+          onClick={handleDownload}
+          className="flex items-center space-x-1 px-3 py-2 text-sm border border-app-border rounded-lg bg-white text-app-text hover:bg-app-bg hover:border-app-accent transition-all duration-200"
+        >
+          <Download className="h-4 w-4" />
+          <span>CSV 다운로드</span>
+        </button>
+      </div>
 
-      <CardContent className="p-0">
-        <div className="border rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {columns.map((column) => (
-                    <TableHead key={column} className="whitespace-nowrap">
+      {/* 테이블 */}
+      <div className="border border-app-border rounded-lg overflow-hidden bg-white">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-app-bg border-b border-app-border hover:bg-app-bg">
+                {columns.map((column) => (
+                  <TableHead 
+                    key={column} 
+                    className="font-semibold text-app-text bg-app-bg border-r border-app-border last:border-r-0 py-4 px-4 text-left min-w-[120px] max-w-[250px]"
+                  >
+                    <div className="truncate" title={column}>
                       {column}
-                    </TableHead>
+                    </div>
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {displayData.map((row, index) => (
+                <TableRow 
+                  key={index} 
+                  className="hover:bg-app-bg/50 border-b border-app-border/50 transition-colors"
+                >
+                  {columns.map((column) => (
+                    <TableCell 
+                      key={column} 
+                      className="py-3 px-4 border-r border-app-border/30 last:border-r-0 align-top min-w-[120px] max-w-[250px]"
+                    >
+                      <div className="break-words">
+                        {formatCellValue(row[column])}
+                      </div>
+                    </TableCell>
                   ))}
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {displayData.map((row, index) => (
-                  <TableRow key={index} className="hover:bg-muted/50">
-                    {columns.map((column) => (
-                      <TableCell key={column} className="max-w-xs">
-                        {formatCellValue(row[column])}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* 페이지네이션 */}
+      {showPagination && totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-app-border">
+          <div className="text-sm text-app-secondary">
+            페이지 {currentPage} / {totalPages} ({((currentPage - 1) * ROWS_PER_PAGE + 1)}-{Math.min(currentPage * ROWS_PER_PAGE, data.length)}번째 표시)
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={cn(
+                "flex items-center justify-center w-8 h-8 border border-app-border rounded-md transition-all duration-200",
+                currentPage === 1
+                  ? "bg-app-bg text-app-secondary cursor-not-allowed"
+                  : "bg-white text-app-text hover:bg-app-bg hover:border-app-accent"
+              )}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className={cn(
+                "flex items-center justify-center w-8 h-8 border border-app-border rounded-md transition-all duration-200",
+                currentPage === totalPages
+                  ? "bg-app-bg text-app-secondary cursor-not-allowed"
+                  : "bg-white text-app-text hover:bg-app-bg hover:border-app-accent"
+              )}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
-
-        {/* 페이지네이션 */}
-        {showPagination && totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t">
-            <div className="text-sm text-muted-foreground">
-              페이지 {currentPage} / {totalPages}
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="h-8 w-8 p-0"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="h-8 w-8 p-0"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }

@@ -73,7 +73,7 @@ export function MessageInput({
 
   return (
     <div>
-      <div className="claude-input-wrapper">
+      <div className="input-wrapper">
         <textarea 
           ref={textareaRef}
           value={message}
@@ -81,20 +81,27 @@ export function MessageInput({
           onKeyDown={handleKeyDown}
           placeholder="GA4 데이터에 대해 질문해보세요..."
           disabled={disabled || state.isProcessing}
-          className="claude-textarea"
+          className="input-textarea"
           maxLength={maxLength}
         />
         
         <button
           onClick={handleSend}
           disabled={!canSend}
-          className="claude-send-button"
+          className="send-button"
         >
           <Send className="h-4 w-4" />
         </button>
       </div>
       
-      <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: '0.5rem',
+        fontSize: '0.75rem',
+        color: 'rgb(102, 102, 102)'
+      }}>
         <span>Enter로 전송, Shift+Enter로 줄바꿈</span>
         <span>{message.length}/{maxLength}</span>
       </div>
