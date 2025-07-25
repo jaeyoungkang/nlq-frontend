@@ -4,8 +4,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Message } from './Message';
 import { useApp } from '@/context/AppContext';
-import { Card } from '@/components/ui/card';
-import { MessageSquare } from 'lucide-react';
 
 interface MessageListProps {
   typingMessageId?: string;
@@ -22,16 +20,51 @@ export function MessageList({ typingMessageId }: MessageListProps): React.ReactE
 
   if (state.messages.length === 0) {
     return (
-      <Card className="p-8 text-center">
-        <div className="flex flex-col items-center space-y-3">
-          <MessageSquare className="h-12 w-12 text-muted-foreground" />
-          <h3 className="text-lg font-medium">GA4 데이터 분석을 시작해보세요</h3>
-          <p className="text-muted-foreground max-w-md">
-            아래 예시 질문을 클릭하거나 직접 질문을 입력해서 
-            자연어로 GA4 데이터를 조회할 수 있습니다.
-          </p>
+      <div className="message">
+        <div className="assistant-message-content">
+          <div className="flex items-start">
+            <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+              AI
+            </div>
+            <div className="flex-1">
+            <p className="mb-4 text-foreground">
+              안녕하세요! 저는 GA4 데이터 분석을 도와드리는 AI 어시스턴트입니다. 
+              자연어로 질문해주시면 BigQuery에서 데이터를 조회하고 결과를 정리해드리겠습니다.
+            </p>
+
+            <div className="claude-result-box">
+                <h3 className="font-medium text-foreground mb-3">💡 예시 질문들</h3>
+                <div className="claude-example-grid">
+                  <ExampleQuestion 
+                    text="총 이벤트 수를 알려주세요"
+                    onClick={() => window.setQuestion?.('총 이벤트 수를 알려주세요')}
+                  />
+                  <ExampleQuestion 
+                    text="가장 많이 발생한 이벤트 유형 상위 10개를 보여주세요"
+                    onClick={() => window.setQuestion?.('가장 많이 발생한 이벤트 유형 상위 10개를 보여주세요')}
+                  />
+                  <ExampleQuestion 
+                    text="국가별 사용자 수를 보여주세요"
+                    onClick={() => window.setQuestion?.('국가별 사용자 수를 보여주세요')}
+                  />
+                  <ExampleQuestion 
+                    text="모바일과 데스크톱 사용자 비율을 보여주세요"
+                    onClick={() => window.setQuestion?.('모바일과 데스크톱 사용자 비율을 보여주세요')}
+                  />
+                  <ExampleQuestion 
+                    text="시간대별 이벤트 수를 보여주세요"
+                    onClick={() => window.setQuestion?.('시간대별 이벤트 수를 보여주세요')}
+                  />
+                  <ExampleQuestion 
+                    text="운영체제별 사용자 분포를 보여주세요"
+                    onClick={() => window.setQuestion?.('운영체제별 사용자 분포를 보여주세요')}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </Card>
+      </div>
     );
   }
 
@@ -47,4 +80,28 @@ export function MessageList({ typingMessageId }: MessageListProps): React.ReactE
       <div ref={messagesEndRef} />
     </div>
   );
+}
+
+// 예시 질문 컴포넌트
+interface ExampleQuestionProps {
+  text: string;
+  onClick: () => void;
+}
+
+function ExampleQuestion({ text, onClick }: ExampleQuestionProps): React.ReactElement {
+  return (
+    <div 
+      className="p-3 border border-border rounded-lg cursor-pointer transition-all duration-200 bg-background hover:border-primary hover:bg-primary/5 text-sm text-foreground"
+      onClick={onClick}
+    >
+      &ldquo;{text}&rdquo;
+    </div>
+  );
+}
+
+// 전역 함수 타입 정의
+declare global {
+  interface Window {
+    setQuestion?: (question: string) => void;
+  }
 }

@@ -2,16 +2,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
 
 interface TypingAnimationProps {
   text?: string;
-  className?: string;
 }
 
 export function TypingAnimation({ 
-  text = "생각하는 중",
-  className 
+  text = "생각하는 중"
 }: TypingAnimationProps): React.ReactElement {
   const [dots, setDots] = useState('');
 
@@ -27,11 +24,11 @@ export function TypingAnimation({
   }, []);
 
   return (
-    <div className={cn("flex items-center space-x-2 text-muted-foreground", className)}>
-      <div className="flex space-x-1">
-        <div className="h-2 w-2 bg-current rounded-full animate-pulse" />
-        <div className="h-2 w-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-        <div className="h-2 w-2 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+    <div className="flex items-center text-muted-foreground">
+      <div className="flex space-x-1 mr-2">
+        <div className="h-1 w-1 bg-current rounded-full animate-pulse" />
+        <div className="h-1 w-1 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
+        <div className="h-1 w-1 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
       </div>
       <span className="text-sm">
         {text}{dots}

@@ -1,27 +1,14 @@
 // components/chat/MessageInput.tsx
 'use client';
 
-import React, { useState, useRef, useCallback, KeyboardEvent } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useRef, useCallback, KeyboardEvent, useEffect } from 'react';
 import { useApp } from '@/context/AppContext';
-import { Send, RotateCcw } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Send } from 'lucide-react';
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
   disabled?: boolean;
 }
-
-const EXAMPLE_QUESTIONS = [
-  "오늘 총 이벤트 수를 알려주세요",
-  "가장 많이 발생한 이벤트 유형을 보여주세요", 
-  "국가별 사용자 수를 보여주세요",
-  "모바일과 데스크톱 사용자 비율을 보여주세요",
-  "page_view 이벤트가 가장 많은 시간대를 보여주세요"
-] as const;
 
 export function MessageInput({ 
   onSendMessage, 
@@ -31,7 +18,7 @@ export function MessageInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { state } = useApp();
 
-  const maxLength = 1000;
+  const maxLength = 2000;
   const isMessageValid = message.trim().length > 0 && message.length <= maxLength;
   const canSend = isMessageValid && !disabled && !state.isProcessing;
 
@@ -40,7 +27,7 @@ export function MessageInput({
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
     }
   }, []);
 
@@ -71,116 +58,46 @@ export function MessageInput({
     }
   };
 
-  const handleExampleClick = (example: string): void => {
-    if (disabled || state.isProcessing) return;
-    setMessage(example);
-    setTimeout(adjustHeight, 0);
-  };
+  // 전역 함수로 예시 질문 설정
+  useEffect(() => {
+    window.setQuestion = (question: string) => {
+      if (disabled || state.isProcessing) return;
+      setMessage(question);
+      setTimeout(adjustHeight, 0);
+    };
 
-  const handleClear = (): void => {
-    setMessage('');
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.focus();
-    }
-  };
+    return () => {
+      window.setQuestion = undefined;
+    };
+  }, [disabled, state.isProcessing, adjustHeight]);
 
   return (
-    <div className="space-y-4">
-      {/* 예시 질문들 */}
-      {state.messages.length === 0 && (
-        <Card className="p-4">
-          <h3 className="text-sm font-medium mb-3 text-muted-foreground">
-            💡 예시 질문을 클릭해보세요
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {EXAMPLE_QUESTIONS.map((example, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className={cn(
-                  "cursor-pointer transition-colors hover:bg-primary hover:text-primary-foreground",
-                  disabled && "cursor-not-allowed opacity-50"
-                )}
-                onClick={() => handleExampleClick(example)}
-              >
-                {example}
-              </Badge>
-            ))}
-          </div>
-        </Card>
-      )}
-
-      {/* 메시지 입력 영역 */}
-      <Card className="p-4">
-        <div className="space-y-3">
-          <div className="relative">
-            <Textarea
-              ref={textareaRef}
-              value={message}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder="GA4 데이터에 대한 질문을 입력하세요... (Shift+Enter로 줄바꿈)"
-              disabled={disabled || state.isProcessing}
-              className="min-h-[60px] max-h-[120px] resize-none pr-20"
-              maxLength={maxLength}
-            />
-            
-            {/* 문자 수 카운터 */}
-            <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-              {message.length}/{maxLength}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between">
-            {/* 상태 표시 */}
-            <div className="flex items-center space-x-2">
-              {state.isProcessing && (
-                <Badge variant="secondary" className="text-xs">
-                  처리 중...
-                </Badge>
-              )}
-              
-              {message.length > maxLength && (
-                <Badge variant="destructive" className="text-xs">
-                  글자 수 초과
-                </Badge>
-              )}
-            </div>
-
-            {/* 버튼들 */}
-            <div className="flex items-center space-x-2">
-              {message.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClear}
-                  disabled={disabled || state.isProcessing}
-                  className="h-8 w-8 p-0"
-                  title="입력 초기화"
-                >
-                  <RotateCcw className="h-4 w-4" />
-                </Button>
-              )}
-              
-              <Button
-                onClick={handleSend}
-                disabled={!canSend}
-                size="sm"
-                className="h-8 px-3"
-              >
-                <Send className="h-4 w-4 mr-1" />
-                전송
-              </Button>
-            </div>
-          </div>
-
-          {/* 도움말 */}
-          <div className="text-xs text-muted-foreground">
-            💡 팁: Enter로 전송, Shift+Enter로 줄바꿈
-          </div>
-        </div>
-      </Card>
+    <div>
+      <div className="claude-input-wrapper">
+        <textarea 
+          ref={textareaRef}
+          value={message}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder="GA4 데이터에 대해 질문해보세요..."
+          disabled={disabled || state.isProcessing}
+          className="claude-textarea"
+          maxLength={maxLength}
+        />
+        
+        <button
+          onClick={handleSend}
+          disabled={!canSend}
+          className="claude-send-button"
+        >
+          <Send className="h-4 w-4" />
+        </button>
+      </div>
+      
+      <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
+        <span>Enter로 전송, Shift+Enter로 줄바꿈</span>
+        <span>{message.length}/{maxLength}</span>
+      </div>
     </div>
   );
 }
