@@ -1,4 +1,6 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   :root {
@@ -8,186 +10,191 @@
     --card-foreground: 47 47 47;
     --popover: 255 255 255;
     --popover-foreground: 47 47 47;
-    --primary: 204 102 51; /* Claude 정확한 오렌지 #CC6633 */
+    --primary: 217 119 6; /* Claude 오렌지 #d97706 */
     --primary-foreground: 255 255 255;
     --secondary: 247 247 248;
     --secondary-foreground: 47 47 47;
     --muted: 247 247 248;
     --muted-foreground: 102 102 102;
-    --accent: 204 102 51; /* Claude 오렌지 */
+    --accent: 217 119 6; /* Claude 오렌지 */
     --accent-foreground: 255 255 255;
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
     --border: 229 229 230;
-    --input: 229 229 230;
-    --ring: 204 102 51;
+    --input: 209 213 219;
+    --ring: 217 119 6;
     --radius: 0.75rem;
+    
+    /* Claude 전용 색상 변수 */
+    --claude-bg: 247 247 248;
+    --claude-border: 229 229 230;
+    --claude-text: 47 47 47;
+    --claude-secondary: 102 102 102;
+    --claude-accent: 217 119 6;
   }
 
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
 
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-white text-foreground;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 }
 
-/* Claude 정확한 컬러 적용 */
-.claude-container {
-  max-width: 768px;
-  margin: 0 auto;
-  background: white;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+@layer components {
+  /* Claude 스타일 컨테이너 */
+  .claude-container {
+    @apply max-w-3xl mx-auto bg-white min-h-screen flex flex-col;
+  }
+
+  .claude-header {
+    @apply bg-white border-b px-6 py-4 sticky top-0 z-10;
+    border-color: rgb(var(--claude-border));
+  }
+
+  .claude-messages {
+    @apply flex-1 px-6 py-4 overflow-y-auto;
+  }
+
+  .claude-input-area {
+    @apply border-t px-6 py-4 bg-white sticky bottom-0;
+    border-color: rgb(var(--claude-border));
+  }
+
+  /* 메시지 스타일 */
+  .message {
+    @apply mb-6;
+  }
+
+  .user-message-bubble {
+    @apply rounded-xl p-4 ml-8 leading-relaxed;
+    background: rgb(var(--claude-bg));
+    border: 1px solid rgb(var(--claude-border));
+    color: rgb(var(--claude-text));
+  }
+
+  .assistant-message-content {
+    @apply mb-6;
+  }
+
+  /* 입력 영역 스타일 */
+  .claude-input-wrapper {
+    @apply relative border rounded-xl bg-white transition-all duration-200;
+    border-color: rgb(var(--input));
+  }
+
+  .claude-input-wrapper:focus-within {
+    border-color: rgb(var(--claude-accent));
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+  }
+
+  .claude-textarea {
+    @apply w-full border-none outline-none resize-none rounded-xl text-base leading-6 bg-transparent;
+    padding: 1rem 3rem 1rem 1rem;
+    max-height: 200px;
+    min-height: 50px;
+  }
+
+  .claude-send-button {
+    @apply absolute right-3 bottom-3 w-8 h-8 border-none rounded-md flex items-center justify-center transition-colors cursor-pointer;
+    background: rgb(var(--claude-accent));
+    color: white;
+  }
+
+  .claude-send-button:hover:not(:disabled) {
+    background: rgb(180 83 9); /* hover:bg-amber-700 */
+  }
+
+  .claude-send-button:disabled {
+    @apply bg-gray-300 cursor-not-allowed;
+  }
+
+  /* 예시 질문 그리드 */
+  .claude-example-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-3;
+  }
+
+  .claude-example-question {
+    @apply p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white text-sm;
+    border-color: rgb(var(--claude-border));
+    color: rgb(var(--claude-text));
+  }
+
+  .claude-example-question:hover {
+    border-color: rgb(var(--claude-accent));
+    background: rgb(254 243 226); /* bg-amber-50 */
+  }
+
+  /* 결과 박스 스타일 */
+  .claude-result-box {
+    @apply rounded-lg p-4 my-4;
+    background: rgb(var(--claude-bg));
+    border: 1px solid rgb(var(--claude-border));
+  }
+
+  .claude-sql-block {
+    @apply rounded-lg p-4 font-mono text-sm leading-6 overflow-x-auto;
+    background: rgb(var(--claude-bg));
+    border: 1px solid rgb(var(--claude-border));
+    color: rgb(var(--claude-text));
+  }
+
+  .claude-badge {
+    @apply inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium bg-white;
+    border-color: rgb(var(--claude-border));
+    color: rgb(var(--claude-text));
+  }
+
+  .claude-badge-secondary {
+    background: rgb(var(--claude-bg));
+    color: rgb(var(--claude-secondary));
+  }
+
+  /* 타이핑 애니메이션 */
+  .typing-indicator {
+    @apply flex items-center text-sm;
+    color: rgb(var(--claude-secondary));
+  }
+
+  .typing-dots {
+    @apply inline-flex ml-2;
+  }
+
+  .typing-dots span {
+    @apply h-1 w-1 rounded-full inline-block mx-0.5;
+    background: rgb(var(--claude-secondary));
+    animation: typing 1.4s infinite ease-in-out;
+  }
+
+  .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+  @keyframes typing {
+    0%, 80%, 100% { opacity: 0.3; }
+    40% { opacity: 1; }
+  }
 }
 
-.claude-header {
-  background: white;
-  border-bottom: 1px solid rgb(229, 229, 230);
-  padding: 1rem 1.5rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.claude-messages {
-  flex: 1;
-  padding: 1rem 1.5rem;
-  overflow-y: auto;
-}
-
-.claude-input-area {
-  border-top: 1px solid rgb(229, 229, 230);
-  padding: 1rem 1.5rem;
-  background: white;
-  position: sticky;
-  bottom: 0;
-}
-
-.user-message-bubble {
-  background: rgb(247, 247, 248);
-  border: 1px solid rgb(229, 229, 230);
-  border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
-  margin-left: 2rem;
-  line-height: 1.6;
-}
-
-.assistant-message-content {
-  margin-bottom: 1.5rem;
-}
-
-.claude-input-wrapper {
-  position: relative;
-  border: 1px solid rgb(209, 213, 219);
-  border-radius: 0.75rem;
-  background: white;
-  transition: border-color 0.2s;
-}
-
-.claude-input-wrapper:focus-within {
-  border-color: rgb(204, 102, 51); /* Claude 오렌지 */
-  box-shadow: 0 0 0 3px rgba(204, 102, 51, 0.1);
-}
-
-.claude-textarea {
-  width: 100%;
-  border: none;
-  outline: none;
-  resize: none;
-  padding: 1rem 3rem 1rem 1rem;
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  max-height: 200px;
-  min-height: 50px;
-  background: transparent;
-}
-
-.claude-send-button {
-  position: absolute;
-  right: 0.75rem;
-  bottom: 0.75rem;
-  width: 2rem;
-  height: 2rem;
-  background: rgb(204, 102, 51); /* Claude 오렌지 */
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-  cursor: pointer;
-}
-
-.claude-send-button:hover:not(:disabled) {
-  background: rgb(180, 85, 40); /* 어두운 Claude 오렌지 */
-}
-
-.claude-send-button:disabled {
-  background: rgb(209, 213, 219);
-  cursor: not-allowed;
-}
-
-.claude-example-card {
-  padding: 0.75rem;
-  border: 1px solid rgb(229, 229, 230);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: white;
-  font-size: 0.9rem;
-  color: rgb(47, 47, 47);
-}
-
-.claude-example-card:hover {
-  border-color: rgb(204, 102, 51); /* Claude 오렌지 */
-  background: rgb(254, 248, 244); /* 연한 Claude 오렌지 배경 */
-}
-
-.claude-result-box {
-  background: rgb(247, 247, 248);
-  border: 1px solid rgb(229, 229, 230);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin: 1rem 0;
-}
-
-.claude-sql-block {
-  background: rgb(247, 247, 248);
-  border: 1px solid rgb(229, 229, 230);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  font-family: ui-monospace, 'SF Mono', monospace;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  overflow-x: auto;
-  color: rgb(47, 47, 47);
-}
-
-.claude-badge {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 0.375rem;
-  border: 1px solid rgb(229, 229, 230);
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: white;
-  color: rgb(47, 47, 47);
-}
-
-.claude-badge-secondary {
-  background: rgb(247, 247, 248);
-  color: rgb(102, 102, 102);
-}
-
-/* AI 아바타 색상도 Claude 오렌지로 */
-.bg-primary {
-  background-color: rgb(204, 102, 51) !important;
+@layer utilities {
+  .bg-claude-accent {
+    background-color: rgb(217 119 6) !important;
+  }
+  
+  .text-claude-text {
+    color: rgb(47 47 47) !important;
+  }
+  
+  .text-claude-secondary {
+    color: rgb(102 102 102) !important;
+  }
+  
+  .bg-claude-bg {
+    background-color: rgb(247 247 248) !important;
+  }
+  
+  .border-claude-border {
+    border-color: rgb(229 229 230) !important;
+  }
 }

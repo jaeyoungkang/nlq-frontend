@@ -23,17 +23,17 @@ export function MessageList({ typingMessageId }: MessageListProps): React.ReactE
       <div className="message">
         <div className="assistant-message-content">
           <div className="flex items-start">
-            <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+            <div className="w-6 h-6 rounded-full text-white text-xs flex items-center justify-center mr-3 mt-0.5 flex-shrink-0 bg-claude-accent">
               AI
             </div>
             <div className="flex-1">
-            <p className="mb-4 text-foreground">
+            <p className="mb-4 text-claude-text">
               안녕하세요! 저는 GA4 데이터 분석을 도와드리는 AI 어시스턴트입니다. 
               자연어로 질문해주시면 BigQuery에서 데이터를 조회하고 결과를 정리해드리겠습니다.
             </p>
 
             <div className="claude-result-box">
-                <h3 className="font-medium text-foreground mb-3">💡 예시 질문들</h3>
+                <h3 className="font-medium text-claude-text mb-3">💡 예시 질문들</h3>
                 <div className="claude-example-grid">
                   <ExampleQuestion 
                     text="총 이벤트 수를 알려주세요"
@@ -91,7 +91,7 @@ interface ExampleQuestionProps {
 function ExampleQuestion({ text, onClick }: ExampleQuestionProps): React.ReactElement {
   return (
     <div 
-      className="p-3 border border-border rounded-lg cursor-pointer transition-all duration-200 bg-background hover:border-primary hover:bg-primary/5 text-sm text-foreground"
+      className="claude-example-question"
       onClick={onClick}
     >
       &ldquo;{text}&rdquo;

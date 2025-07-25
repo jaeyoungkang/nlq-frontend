@@ -24,11 +24,11 @@ export function TypingAnimation({
   }, []);
 
   return (
-    <div className="flex items-center text-muted-foreground">
-      <div className="flex space-x-1 mr-2">
-        <div className="h-1 w-1 bg-current rounded-full animate-pulse" />
-        <div className="h-1 w-1 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
-        <div className="h-1 w-1 bg-current rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
+    <div className="typing-indicator">
+      <div className="typing-dots">
+        <span />
+        <span />
+        <span />
       </div>
       <span className="text-sm">
         {text}{dots}
